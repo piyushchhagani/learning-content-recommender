@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 
+from app.schemas.youtube import YouTubeSearchResponse
 from app.services.youtube_service import search_youtube
 
 
@@ -9,7 +10,10 @@ router = APIRouter(
 )
 
 
-@router.get("/search")
+@router.get(
+    "/search",
+    response_model=YouTubeSearchResponse,
+)
 async def youtube_search(
     q: str = Query(..., min_length=1),
     max_results: int = Query(10, ge=1, le=50),
