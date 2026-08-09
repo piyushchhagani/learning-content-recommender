@@ -1,6 +1,21 @@
+import { useQuery } from '@tanstack/react-query'
 import { Search } from 'lucide-react'
 
+import { getHealth } from '../lib/api'
+
 export function HomePage() {
+  const healthQuery = useQuery({
+    queryKey: ['health'],
+    queryFn: getHealth,
+  })
+
+  const backendStatus =
+    healthQuery.isLoading
+      ? 'Checking backend...'
+      : healthQuery.isError
+        ? 'Backend unavailable'
+        : 'Backend connected'
+
   return (
     <main className="min-h-screen bg-slate-50">
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-16">
@@ -28,14 +43,24 @@ export function HomePage() {
                 placeholder="Try: Docker, Python, SQL..."
                 className="w-full bg-transparent py-4 text-slate-900 outline-none placeholder:text-slate-400"
               />
-            </div>
 
-            <button
-              type="button"
-              className="rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white transition hover:bg-slate-800"
-            >
-              Explore
-            </button>
+              <button
+                type="button"
+                className="ml-3 rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white transition hover:bg-slate-800"
+              >
+                Explore
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center gap-2 text-sm text-slate-500">
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${
+                healthQuery.isError ? 'bg-red-500' : 'bg-green-500'
+              }`}
+            />
+
+            <span>{backendStatus}</span>
           </div>
         </div>
       </section>
