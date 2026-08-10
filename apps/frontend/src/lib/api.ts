@@ -18,6 +18,11 @@ export interface YouTubeVideo {
   channel_title: string
   published_at: string
   thumbnail: string
+  duration: string
+  duration_iso: string
+  view_count: number
+  like_count: number
+  comment_count: number
 }
 
 export interface YouTubeSearchResponse {

@@ -4,6 +4,24 @@ import { Search } from 'lucide-react'
 
 import { getHealth, searchYouTube } from '../lib/api'
 
+function formatNumber(value: number): string {
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(2)}M`
+  }
+
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(1)}K`
+  }
+
+  return value.toString()
+}
+
+function decodeHtmlEntities(value: string): string {
+  const parser = new DOMParser()
+  return parser.parseFromString(value, 'text/html').documentElement.textContent ?? value
+}
+
+
 export function HomePage() {
   const [search, setSearch] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
@@ -124,19 +142,29 @@ export function HomePage() {
                 className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
               >
                 <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="aspect-video w-full object-cover"
-                />
+ 		 src={video.thumbnail}
+  		 alt={decodeHtmlEntities(video.title)}
+   		 className="aspect-video w-full object-cover"
+		/>
 
                 <div className="p-5">
                   <h3 className="font-semibold leading-6 text-slate-900">
-                    {video.title}
-                  </h3>
+  		     {decodeHtmlEntities(video.title)}
+		  </h3>
 
                   <p className="mt-2 text-sm text-slate-500">
                     {video.channel_title}
                   </p>
+		  
+		  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+  			<span>{video.duration}</span>
+  			<span>•</span>
+  			<span>{formatNumber(video.view_count)} views</span>
+  			<span>•</span>
+ 		  	<span>{formatNumber(video.like_count)} likes</span>
+  			<span>•</span>
+  			<span>{formatNumber(video.comment_count)} comments</span>
+		  </div>
 
                   <a
                     href={`https://www.youtube.com/watch?v=${video.video_id}`}
