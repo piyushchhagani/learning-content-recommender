@@ -18,4 +18,5 @@ class YouTubeVideo(BaseModel):
 class YouTubeSearchResponse(BaseModel):
     query: str
     count: int
+    next_page_token: str | None = None
     results: list[YouTubeVideo]

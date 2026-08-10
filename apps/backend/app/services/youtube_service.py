@@ -13,7 +13,8 @@ YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 async def search_youtube(
     query: str,
     max_results: int = 10,
-) -> list[dict[str, Any]]:
+    page_token: str | None = None,
+) -> dict[str, Any]:
     settings = get_settings()
 
     if not settings.youtube_api_key:
@@ -26,6 +27,9 @@ async def search_youtube(
         "maxResults": max_results,
         "key": settings.youtube_api_key,
     }
+
+    if page_token:
+        search_params["pageToken"] = page_token
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         search_response = await client.get(
@@ -67,7 +71,10 @@ async def search_youtube(
             )
 
         if not results:
-            return []
+            return {
+                "results": [],
+                "next_page_token": None,
+            }
 
         video_ids = ",".join(
             result["video_id"] for result in results
@@ -106,4 +113,7 @@ async def search_youtube(
         result["like_count"] = int(statistics.get("likeCount", 0))
         result["comment_count"] = int(statistics.get("commentCount", 0))
 
-    return results
+    return {
+        "results": results,
+        "next_page_token": search_data.get("nextPageToken"),
+    }
