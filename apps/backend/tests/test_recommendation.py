@@ -111,3 +111,18 @@ def test_unrelated_video_gets_no_relevance_score():
     }
 
     assert calculate_recommendation_score(video) == 0.0
+
+def test_recommendation_score_is_capped_at_100():
+    video = {
+        "search_query": "web development",
+        "title": "Web Development Full Course",
+        "description": "Complete web development course.",
+        "view_count": 10_000_000,
+        "like_count": 1_000_000,
+        "comment_count": 100_000,
+        "duration": "2h",
+    }
+
+    score = calculate_recommendation_score(video)
+
+    assert score == 100.0

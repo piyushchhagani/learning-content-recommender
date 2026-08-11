@@ -67,4 +67,4 @@ def calculate_recommendation_score(video: dict[str, Any]) -> float:
 
     score += _duration_score(video.get("duration", ""))
 
-    return round(score, 2)
+    return min(round(score, 2), 100.0)
