@@ -7,9 +7,7 @@ def _duration_score(duration: str) -> float:
 
     total_minutes = 0
 
-    parts = duration.split()
-
-    for part in parts:
+    for part in duration.split():
         if part.endswith("h"):
             total_minutes += int(part[:-1]) * 60
         elif part.endswith("m"):
@@ -74,15 +72,17 @@ def calculate_recommendation_breakdown(
         video.get("duration", "")
     )
 
-    raw_score = (
-        relevance_score
-        + views_score
-        + like_score
-        + comment_score
-        + duration_score
+    total_score = min(
+        round(
+            relevance_score
+            + views_score
+            + like_score
+            + comment_score
+            + duration_score,
+            2,
+        ),
+        100.0,
     )
-
-    total_score = min(round(raw_score, 2), 100.0)
 
     return {
         "relevance_score": round(relevance_score, 2),
@@ -94,9 +94,5 @@ def calculate_recommendation_breakdown(
     }
 
 
-def calculate_recommendation_score(
-    video: dict[str, Any],
-) -> float:
-    breakdown = calculate_recommendation_breakdown(video)
-
-    return breakdown["total_score"]
+def calculate_recommendation_score(video: dict[str, Any]) -> float:
+    return calculate_recommendation_breakdown(video)["total_score"]

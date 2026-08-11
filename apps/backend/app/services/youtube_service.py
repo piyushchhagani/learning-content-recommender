@@ -4,7 +4,10 @@ import httpx
 
 from app.core.config import get_settings
 from app.services.duration import format_duration
-from app.services.recommendation import calculate_recommendation_score
+from app.services.recommendation import (
+    calculate_recommendation_breakdown,
+    calculate_recommendation_score,
+)
 
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
@@ -116,9 +119,11 @@ async def search_youtube(
         )
 
         result["search_query"] = query
-        result["recommendation_score"] = calculate_recommendation_score(
-            result
-        )
+
+        breakdown = calculate_recommendation_breakdown(result)
+
+        result["recommendation_score"] = breakdown["total_score"]
+        result["recommendation_breakdown"] = breakdown
 
     return {
         "results": results,
