@@ -28,6 +28,7 @@ def _duration_score(duration: str) -> float:
 
     return 10.0
 
+
 def _relevance_score(video: dict[str, Any]) -> float:
     query = str(video.get("search_query", "")).strip().lower()
 
@@ -45,26 +46,57 @@ def _relevance_score(video: dict[str, Any]) -> float:
 
     return 0.0
 
-def calculate_recommendation_score(video: dict[str, Any]) -> float:
+
+def calculate_recommendation_breakdown(
+    video: dict[str, Any],
+) -> dict[str, float]:
     views = max(int(video.get("view_count", 0)), 0)
     likes = max(int(video.get("like_count", 0)), 0)
     comments = max(int(video.get("comment_count", 0)), 0)
 
-    score = 0.0
+    relevance_score = _relevance_score(video)
 
-    score += _relevance_score(video)
-
+    views_score = 0.0
     if views > 0:
-        score += min(views / 1_000_000, 1.0) * 40
+        views_score = min(views / 1_000_000, 1.0) * 40
 
+    like_score = 0.0
     if likes > 0 and views > 0:
         like_ratio = likes / views
-        score += min(like_ratio / 0.05, 1.0) * 30
+        like_score = min(like_ratio / 0.05, 1.0) * 30
 
+    comment_score = 0.0
     if comments > 0 and views > 0:
         comment_ratio = comments / views
-        score += min(comment_ratio / 0.005, 1.0) * 10
+        comment_score = min(comment_ratio / 0.005, 1.0) * 10
 
-    score += _duration_score(video.get("duration", ""))
+    duration_score = _duration_score(
+        video.get("duration", "")
+    )
 
-    return min(round(score, 2), 100.0)
+    raw_score = (
+        relevance_score
+        + views_score
+        + like_score
+        + comment_score
+        + duration_score
+    )
+
+    total_score = min(round(raw_score, 2), 100.0)
+
+    return {
+        "relevance_score": round(relevance_score, 2),
+        "views_score": round(views_score, 2),
+        "like_score": round(like_score, 2),
+        "comment_score": round(comment_score, 2),
+        "duration_score": round(duration_score, 2),
+        "total_score": total_score,
+    }
+
+
+def calculate_recommendation_score(
+    video: dict[str, Any],
+) -> float:
+    breakdown = calculate_recommendation_breakdown(video)
+
+    return breakdown["total_score"]

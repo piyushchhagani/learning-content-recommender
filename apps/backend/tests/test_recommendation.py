@@ -126,3 +126,43 @@ def test_recommendation_score_is_capped_at_100():
     score = calculate_recommendation_score(video)
 
     assert score == 100.0
+
+def test_recommendation_breakdown_contains_all_components():
+    from app.services.recommendation import calculate_recommendation_breakdown
+
+    video = {
+        "search_query": "python",
+        "title": "Python Full Course",
+        "description": "Learn Python from scratch.",
+        "view_count": 1_000_000,
+        "like_count": 50_000,
+        "comment_count": 5_000,
+        "duration": "1h",
+    }
+
+    breakdown = calculate_recommendation_breakdown(video)
+
+    assert breakdown["relevance_score"] == 20.0
+    assert breakdown["views_score"] == 40.0
+    assert breakdown["like_score"] == 30.0
+    assert breakdown["comment_score"] == 10.0
+    assert breakdown["duration_score"] == 20.0
+    assert breakdown["total_score"] == 100.0
+
+
+def test_recommendation_breakdown_total_is_capped():
+    from app.services.recommendation import calculate_recommendation_breakdown
+
+    video = {
+        "search_query": "python",
+        "title": "Python Full Course",
+        "description": "Learn Python from scratch.",
+        "view_count": 10_000_000,
+        "like_count": 1_000_000,
+        "comment_count": 100_000,
+        "duration": "2h",
+    }
+
+    breakdown = calculate_recommendation_breakdown(video)
+
+    assert breakdown["total_score"] == 100.0
