@@ -13,6 +13,7 @@ class YouTubeVideo(BaseModel):
     view_count: int
     like_count: int
     comment_count: int
+    recommendation_score: float
 
 
 class YouTubeSearchResponse(BaseModel):

@@ -4,7 +4,7 @@ import httpx
 
 from app.core.config import get_settings
 from app.services.duration import format_duration
-
+from app.services.recommendation import calculate_recommendation_score
 
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
@@ -112,6 +112,9 @@ async def search_youtube(
         result["view_count"] = int(statistics.get("viewCount", 0))
         result["like_count"] = int(statistics.get("likeCount", 0))
         result["comment_count"] = int(statistics.get("commentCount", 0))
+        result["recommendation_score"] = calculate_recommendation_score(
+            result
+        )
 
     return {
         "results": results,
