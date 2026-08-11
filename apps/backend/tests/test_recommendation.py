@@ -71,3 +71,43 @@ def test_very_long_video_gets_partial_duration_score():
 
     assert calculate_recommendation_score(video) == 10.0
 
+def test_title_relevance_gets_higher_score():
+    video = {
+        "search_query": "python",
+        "title": "Python Full Course for Beginners",
+        "description": "",
+        "view_count": 0,
+        "like_count": 0,
+        "comment_count": 0,
+        "duration": "",
+    }
+
+    assert calculate_recommendation_score(video) == 20.0
+
+
+def test_description_relevance_gets_partial_score():
+    video = {
+        "search_query": "python",
+        "title": "Complete Programming Course",
+        "description": "Learn Python from scratch.",
+        "view_count": 0,
+        "like_count": 0,
+        "comment_count": 0,
+        "duration": "",
+    }
+
+    assert calculate_recommendation_score(video) == 10.0
+
+
+def test_unrelated_video_gets_no_relevance_score():
+    video = {
+        "search_query": "python",
+        "title": "Docker Full Course",
+        "description": "Learn containers and Kubernetes.",
+        "view_count": 0,
+        "like_count": 0,
+        "comment_count": 0,
+        "duration": "",
+    }
+
+    assert calculate_recommendation_score(video) == 0.0

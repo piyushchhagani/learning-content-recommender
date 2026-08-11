@@ -28,6 +28,22 @@ def _duration_score(duration: str) -> float:
 
     return 10.0
 
+def _relevance_score(video: dict[str, Any]) -> float:
+    query = str(video.get("search_query", "")).strip().lower()
+
+    if not query:
+        return 0.0
+
+    title = str(video.get("title", "")).lower()
+    description = str(video.get("description", "")).lower()
+
+    if query in title:
+        return 20.0
+
+    if query in description:
+        return 10.0
+
+    return 0.0
 
 def calculate_recommendation_score(video: dict[str, Any]) -> float:
     views = max(int(video.get("view_count", 0)), 0)
@@ -35,6 +51,8 @@ def calculate_recommendation_score(video: dict[str, Any]) -> float:
     comments = max(int(video.get("comment_count", 0)), 0)
 
     score = 0.0
+
+    score += _relevance_score(video)
 
     if views > 0:
         score += min(views / 1_000_000, 1.0) * 40
