@@ -166,3 +166,57 @@ def test_recommendation_breakdown_total_is_capped():
     breakdown = calculate_recommendation_breakdown(video)
 
     assert breakdown["total_score"] == 100.0
+
+def test_recommendation_scores_are_ordered_descending():
+    from app.services.recommendation import calculate_recommendation_score
+
+    videos = [
+        {
+            "search_query": "python",
+            "title": "Python Basics",
+            "description": "",
+            "view_count": 100_000,
+            "like_count": 1_000,
+            "comment_count": 100,
+            "duration": "10m",
+        },
+        {
+            "search_query": "python",
+            "title": "Python Full Course",
+            "description": "Learn Python from scratch.",
+            "view_count": 5_000_000,
+            "like_count": 250_000,
+            "comment_count": 10_000,
+            "duration": "2h",
+        },
+        {
+            "search_query": "python",
+            "title": "Python Quick Tutorial",
+            "description": "",
+            "view_count": 500_000,
+            "like_count": 10_000,
+            "comment_count": 500,
+            "duration": "20m",
+        },
+    ]
+
+    scored_videos = [
+        {
+            **video,
+            "recommendation_score": calculate_recommendation_score(video),
+        }
+        for video in videos
+    ]
+
+    ranked_videos = sorted(
+        scored_videos,
+        key=lambda video: video["recommendation_score"],
+        reverse=True,
+    )
+
+    scores = [
+        video["recommendation_score"]
+        for video in ranked_videos
+    ]
+
+    assert scores == sorted(scores, reverse=True)
