@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
- baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000',
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,24 +29,31 @@ export interface YouTubeVideo {
 export interface YouTubeSearchResponse {
   query: string
   count: number
+  next_page_token: string | null
   results: YouTubeVideo[]
 }
 
 export async function getHealth(): Promise<HealthResponse> {
-  const response = await api.get('/health')
+  const response = await api.get<HealthResponse>('/health')
+
   return response.data
 }
 
 export async function searchYouTube(
   query: string,
   maxResults = 10,
+  pageToken?: string,
 ): Promise<YouTubeSearchResponse> {
-  const response = await api.get('/api/youtube/search', {
-    params: {
-      q: query,
-      max_results: maxResults,
+  const response = await api.get<YouTubeSearchResponse>(
+    '/api/youtube/search',
+    {
+      params: {
+        q: query,
+        max_results: maxResults,
+        ...(pageToken ? { page_token: pageToken } : {}),
+      },
     },
-  })
+  )
 
   return response.data
 }
