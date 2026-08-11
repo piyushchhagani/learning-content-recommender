@@ -226,6 +226,12 @@ export function HomePage() {
                           {formatNumber(video.comment_count)} comments
                         </span>
                       </div>
+		      <div className="mt-3">
+  			<span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+    			Recommendation Score:{' '}
+    			{video.recommendation_score.toFixed(1)}
+ 			</span>
+			</div>
 
                       <a
                         href={`https://www.youtube.com/watch?v=${video.video_id}`}
