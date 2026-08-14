@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.youtube import router as youtube_router
 
 from app.core.config import get_settings
 
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(youtube_router)
 
 @app.get("/")
 async def root():
