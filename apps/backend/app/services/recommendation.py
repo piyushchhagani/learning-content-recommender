@@ -96,3 +96,13 @@ def calculate_recommendation_breakdown(
 
 def calculate_recommendation_score(video: dict[str, Any]) -> float:
     return calculate_recommendation_breakdown(video)["total_score"]
+
+def filter_recommendations(
+    videos: list[dict[str, Any]],
+    min_score: float = 30.0,
+) -> list[dict[str, Any]]:
+    return [
+        video
+        for video in videos
+        if video.get("recommendation_score", 0.0) >= min_score
+    ]

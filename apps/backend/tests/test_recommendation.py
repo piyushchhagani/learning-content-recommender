@@ -220,3 +220,41 @@ def test_recommendation_scores_are_ordered_descending():
     ]
 
     assert scores == sorted(scores, reverse=True)
+
+def test_filter_recommendations_removes_low_score_videos():
+    from app.services.recommendation import filter_recommendations
+
+    videos = [
+        {"recommendation_score": 80.0},
+        {"recommendation_score": 25.0},
+        {"recommendation_score": 60.0},
+    ]
+
+    filtered = filter_recommendations(videos)
+
+    assert filtered == [
+        {"recommendation_score": 80.0},
+        {"recommendation_score": 60.0},
+    ]
+
+
+def test_filter_recommendations_keeps_score_at_threshold():
+    from app.services.recommendation import filter_recommendations
+
+    videos = [
+        {"recommendation_score": 30.0},
+        {"recommendation_score": 29.99},
+    ]
+
+    filtered = filter_recommendations(videos)
+
+    assert filtered == [
+        {"recommendation_score": 30.0},
+    ]
+
+
+def test_filter_recommendations_handles_empty_list():
+    from app.services.recommendation import filter_recommendations
+
+    assert filter_recommendations([]) == []
+
