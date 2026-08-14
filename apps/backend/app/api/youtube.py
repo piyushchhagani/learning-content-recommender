@@ -18,6 +18,7 @@ async def youtube_search(
     q: str = Query(..., min_length=1),
     max_results: int = Query(10, ge=1, le=50),
     page_token: str | None = Query(None),
+    min_score: float = Query(30.0, ge=0.0, le=100.0),
 ):
     query = q.strip()
 
@@ -32,6 +33,7 @@ async def youtube_search(
             query,
             max_results,
             page_token,
+            min_score,
         )
     except Exception as exc:
         raise HTTPException(
