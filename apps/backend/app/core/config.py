@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     redis_url: str = ""
 
     youtube_api_key: str = ""
+    recommendation_min_score: float = 30.0
 
     llm_api_key: str = ""
     llm_model: str = ""
