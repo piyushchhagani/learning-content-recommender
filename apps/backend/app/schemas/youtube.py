@@ -1,5 +1,12 @@
 from pydantic import BaseModel
 
+class RecommendationBreakdown(BaseModel):
+    relevance_score: float
+    views_score: float
+    like_score: float
+    comment_score: float
+    duration_score: float
+    total_score: float
 
 class YouTubeVideo(BaseModel):
     video_id: str
@@ -13,6 +20,8 @@ class YouTubeVideo(BaseModel):
     view_count: int
     like_count: int
     comment_count: int
+    recommendation_score: float
+    recommendation_breakdown: RecommendationBreakdown
 
 
 class YouTubeSearchResponse(BaseModel):

@@ -24,6 +24,7 @@ export interface YouTubeVideo {
   view_count: number
   like_count: number
   comment_count: number
+  recommendation_score: number
 }
 
 export interface YouTubeSearchResponse {
