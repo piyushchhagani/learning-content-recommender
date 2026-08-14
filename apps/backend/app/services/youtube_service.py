@@ -6,8 +6,8 @@ from app.core.config import get_settings
 from app.services.duration import format_duration
 from app.services.recommendation import (
     calculate_recommendation_breakdown,
-    calculate_recommendation_score,
 )
+
 
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
@@ -99,33 +99,42 @@ async def search_youtube(
         video_data = video_response.json()
 
         metadata = {
-        item["id"]: item
-        for item in video_data.get("items", [])
-    }
+            item["id"]: item
+            for item in video_data.get("items", [])
+        }
 
-    for result in results:
-        video = metadata.get(result["video_id"], {})
-        content_details = video.get("contentDetails", {})
-        statistics = video.get("statistics", {})
+        for result in results:
+            video = metadata.get(result["video_id"], {})
+            content_details = video.get("contentDetails", {})
+            statistics = video.get("statistics", {})
 
-        raw_duration = content_details.get("duration", "")
+            raw_duration = content_details.get("duration", "")
 
-        result["duration"] = format_duration(raw_duration)
-        result["duration_iso"] = raw_duration
-        result["view_count"] = int(statistics.get("viewCount", 0))
-        result["like_count"] = int(statistics.get("likeCount", 0))
-        result["comment_count"] = int(
-            statistics.get("commentCount", 0)
+            result["duration"] = format_duration(raw_duration)
+            result["duration_iso"] = raw_duration
+            result["view_count"] = int(
+                statistics.get("viewCount", 0)
+            )
+            result["like_count"] = int(
+                statistics.get("likeCount", 0)
+            )
+            result["comment_count"] = int(
+                statistics.get("commentCount", 0)
+            )
+
+            result["search_query"] = query
+
+            breakdown = calculate_recommendation_breakdown(result)
+
+            result["recommendation_score"] = breakdown["total_score"]
+            result["recommendation_breakdown"] = breakdown
+
+        results.sort(
+            key=lambda result: result["recommendation_score"],
+            reverse=True,
         )
 
-        result["search_query"] = query
-
-        breakdown = calculate_recommendation_breakdown(result)
-
-        result["recommendation_score"] = breakdown["total_score"]
-        result["recommendation_breakdown"] = breakdown
-
-    return {
-        "results": results,
-        "next_page_token": search_data.get("nextPageToken"),
-    }
+        return {
+            "results": results,
+            "next_page_token": search_data.get("nextPageToken"),
+        }
